@@ -1,0 +1,14 @@
+[tools]
+erlang = "28.5.0.8"
+
+[tasks.ci]
+description = "Build strictly and run all EUnit tests"
+run = "sh scripts/check.sh all"
+
+[tasks."test:structured-fields"]
+description = "Check structured-field serialization"
+run = "sh scripts/check.sh structured-fields"
+
+[tasks."core:secrets"]
+description = "Scan the complete proposed history for secrets"
+run = "sh scripts/check.sh secrets"
