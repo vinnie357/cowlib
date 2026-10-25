@@ -12,3 +12,5 @@ examples/*/ebin
 logs
 relx
 test/*.beam
+
+.cowlib-check-*.log

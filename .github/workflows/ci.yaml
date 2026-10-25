@@ -1,36 +1,21 @@
-## Use workflows from ninenines/ci.erlang.mk to test Cowlib.
-
-name: Check Cowlib
+name: Cowlib compatibility checks
 
 on:
   push:
-    branches:
-      - master
+    branches: [compat/2.21]
   pull_request:
-  schedule:
-      ## Every Monday at 2am.
-      - cron: 0 2 * * 1
+    branches: [compat/2.21]
 
-env:
-  CI_ERLANG_MK: 1
+permissions:
+  contents: read
 
 jobs:
-  check:
-    name: Check
-    uses: ninenines/ci.erlang.mk/.github/workflows/ci.yaml@master
-
-  perfs:
-    name: Run performance tests
+  ci:
     runs-on: ubuntu-latest
     steps:
-
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Install latest Erlang/OTP
-      uses: erlef/setup-beam@v1
-      with:
-        otp-version: '> 0'
-
-    - name: Run perfs
-      run: make perfs
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@v4
+      - name: Build strictly and run EUnit
+        run: mise run ci

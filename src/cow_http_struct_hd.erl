@@ -562,7 +562,9 @@ exp_div(N) -> 10 * exp_div(N + 1).
 escape_string(<<>>, Acc) -> Acc;
 escape_string(<<$\\,R/bits>>, Acc) -> escape_string(R, <<Acc/binary,$\\,$\\>>);
 escape_string(<<$",R/bits>>, Acc) -> escape_string(R, <<Acc/binary,$\\,$">>);
-escape_string(<<C,R/bits>>, Acc) -> escape_string(R, <<Acc/binary,C>>).
+escape_string(<<C,R/bits>>, Acc)
+		when C >= 16#20, C =< 16#7e ->
+	escape_string(R, <<Acc/binary,C>>).
 
 params(Params) ->
 	[case Param of
@@ -618,6 +620,18 @@ struct_hd_identity_test_() ->
 			<<"expected">> := Expected0
 		} <- Tests]
 	end || File <- Files]).
+
+item_string_invalid_byte_test_() ->
+	[{integer_to_list(Byte), fun() ->
+		?assertError(function_clause,
+			item({item, {string, <<"prefix", Byte, "suffix">>}, []}))
+	end} || Byte <- lists:seq(0, 31) ++ lists:seq(127, 255)].
+
+item_string_printable_ascii_test_() ->
+	[{integer_to_list(Byte), fun() ->
+		Item = {item, {string, <<"prefix", Byte, "suffix">>}, []},
+		?assertEqual(Item, parse_item(iolist_to_binary(item(Item))))
+	end} || Byte <- lists:seq(32, 126)].
 
 struct_hd_item_test() ->
 	<<"token">> = iolist_to_binary(item({item, {token, <<"token">>}, []})),
