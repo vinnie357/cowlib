@@ -562,7 +562,9 @@ exp_div(N) -> 10 * exp_div(N + 1).
 escape_string(<<>>, Acc) -> Acc;
 escape_string(<<$\\,R/bits>>, Acc) -> escape_string(R, <<Acc/binary,$\\,$\\>>);
 escape_string(<<$",R/bits>>, Acc) -> escape_string(R, <<Acc/binary,$\\,$">>);
-escape_string(<<C,R/bits>>, Acc) -> escape_string(R, <<Acc/binary,C>>).
+escape_string(<<C,R/bits>>, Acc)
+		when C >= 16#20, C =< 16#7e ->
+	escape_string(R, <<Acc/binary,C>>).
 
 params(Params) ->
 	[case Param of
